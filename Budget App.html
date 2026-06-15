@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Financial Discovery — Eau Claire Partners</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FAFAF8;--surface:#FFFFFF;--border:#E2DFD8;--borderDark:#C8C4BC;
+  --text:#1A1A1A;--textMid:#444444;--textMuted:#777777;
+  --gold:#B8973A;--goldBg:#FAF6EC;--goldBorder:#E8D9A0;
+  --teal:#1A6A7A;--tealBg:#F0F8FA;
+  --green:#1A7A4E;--greenBg:#F0FAF5;
+  --red:#C0392B;--redBg:#FDF3F2;
+  --purple:#5B3A8A;--purpleBg:#F6F3FB;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-size:16px}
+body{min-height:100vh;min-height:-webkit-fill-available}
+
+.shell{min-height:100vh;display:flex;flex-direction:column;max-width:520px;margin:0 auto;padding:0 20px}
+
+/* HEADER */
+.wiz-header{padding:20px 0 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.logo-sub{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);display:block;margin-bottom:2px}
+.logo-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.header-step{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--textMuted)}
+
+/* PROGRESS */
+.progress-wrap{margin:16px 0 0;height:4px;background:var(--border);border-radius:2px;overflow:hidden;flex-shrink:0}
+.progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s ease}
+
+/* SCREENS */
+.screen{display:none;flex:1;flex-direction:column}
+.screen.active{display:flex}
+
+/* WELCOME */
+.welcome-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:28px 0 20px}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--goldBg);border:1px solid var(--goldBorder);border-radius:20px;padding:5px 14px;font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:20px;font-weight:500}
+.welcome-h1{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;line-height:1.22;margin-bottom:14px}
+.welcome-desc{font-size:15px;color:var(--textMid);line-height:1.65;margin-bottom:24px}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.pill{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-size:13px;color:var(--textMid)}
+.privacy-note{font-size:12px;color:var(--textMuted);display:flex;align-items:flex-start;gap:7px;margin-top:14px;line-height:1.5}
+
+/* SLIDE AREA */
+.slide-area{flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding:28px 0 12px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.q-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);margin-bottom:10px;font-weight:500}
+.q-text{font-family:'Playfair Display',serif;font-size:25px;font-weight:700;line-height:1.28;margin-bottom:8px}
+.q-hint{font-size:14px;color:var(--textMuted);line-height:1.6;margin-bottom:22px}
+
+/* OPTION CARDS */
+.opt-list{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.opt-card{background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s;user-select:none}
+.opt-card:active{background:var(--goldBg)}
+.opt-card.selected{border-color:var(--gold);background:var(--goldBg)}
+.opt-card.sel-teal{border-color:var(--teal);background:var(--tealBg)}
+.opt-icon{font-size:22px;width:30px;text-align:center;flex-shrink:0}
+.opt-text{flex:1}
+.opt-label{font-size:15px;font-weight:600;color:var(--text);line-height:1.3}
+.opt-sub{font-size:12px;color:var(--textMuted);margin-top:2px}
+.opt-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.opt-card.selected .opt-check{background:var(--gold);border-color:var(--gold)}
+.opt-card.sel-teal .opt-check{background:var(--teal);border-color:var(--teal)}
+.check-dot{width:8px;height:8px;background:#fff;border-radius:50%;display:none}
+.opt-card.selected .check-dot,.opt-card.sel-teal .check-dot{display:block}
+
+/* 2-COL GRID OPTIONS */
+.opt-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:20px}
+.opt-compact{background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:14px 10px;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:center;transition:border-color .15s,background .15s;user-select:none}
+.opt-compact.selected{border-color:var(--gold);background:var(--goldBg);color:var(--gold)}
+.opt-compact .opt-icon{display:block;font-size:22px;margin-bottom:6px;width:auto}
+.opt-compact .opt-label{font-size:14px;font-weight:600;color:inherit}
+
+/* SLIDER */
+.slider-display{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;color:var(--gold);margin-bottom:4px}
+.slider-sub{font-size:13px;color:var(--textMuted);margin-bottom:20px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:var(--border);border-radius:3px;outline:none;cursor:pointer;margin-bottom:10px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;background:var(--gold);border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(184,151,58,.3);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:28px;height:28px;background:var(--gold);border-radius:50%;border:3px solid #fff;cursor:pointer}
+.slider-ticks{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--textMuted);margin-bottom:20px}
+
+/* BUTTONS */
+.btn-primary{background:var(--gold);color:#fff;border:none;border-radius:12px;padding:16px 24px;font-size:16px;font-weight:600;cursor:pointer;font-family:'Inter',system-ui,sans-serif;width:100%;-webkit-tap-highlight-color:transparent;transition:opacity .15s;touch-action:manipulation}
+.btn-primary:active{opacity:.85}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-back{width:52px;height:52px;background:var(--surface);border:2px solid var(--border);border-radius:12px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--textMuted);flex-shrink:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.btn-back:active{background:var(--bg)}
+.nav-row{display:flex;gap:10px;align-items:center;padding:12px 0 32px;flex-shrink:0}
+.nav-row .btn-primary{flex:1}
+
+/* RESULT SCREEN */
+.result-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 0 0}
+.result-hero{text-align:center;padding:20px 0 20px}
+.result-icon{font-size:48px;margin-bottom:12px}
+.result-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:8px}
+.result-sub{font-size:14px;color:var(--textMid);line-height:1.6;max-width:320px;margin:0 auto}
+.r-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px}
+.r-card-teal{border-left:3px solid var(--teal)}
+.r-card-gold{border-left:3px solid var(--gold)}
+.r-card-title{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--textMuted);margin-bottom:12px}
+.r-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}
+.r-row:last-child{border-bottom:none}
+.r-lbl{font-size:14px;color:var(--textMid)}
+.r-val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500}
+.r-val.green{color:var(--green)}
+.r-val.red{color:var(--red)}
+.r-val.gold{color:var(--gold)}
+.insight{border-radius:12px;padding:14px;margin-bottom:10px;display:flex;gap:11px;align-items:flex-start}
+.i-icon{font-size:19px;flex-shrink:0;margin-top:1px}
+.i-text{font-size:14px;line-height:1.6}
+.i-title{font-weight:600;margin-bottom:3px;font-size:13px}
+.ins-gold{background:var(--goldBg);border:1px solid var(--goldBorder);color:#7A5F10}
+.ins-teal{background:var(--tealBg);border:1px solid #A8D8E0;color:var(--teal)}
+.ins-green{background:var(--greenBg);border:1px solid #9DE0BC;color:var(--green)}
+.ins-purple{background:var(--purpleBg);border:1px solid #C8B8E8;color:var(--purple)}
+.ins-red{background:var(--redBg);border:1px solid #F0BABA;color:var(--red)}
+.cta-card{background:linear-gradient(135deg,#1A6A7A 0%,#1A4050 100%);border-radius:14px;padding:24px;text-align:center;margin-bottom:16px}
+.cta-h3{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;margin-bottom:8px}
+.cta-p{font-size:14px;color:rgba(255,255,255,.8);margin-bottom:20px;line-height:1.6}
+.cta-p strong{color:#fff}
+.btn-cta{background:#fff;color:var(--teal);border:none;border-radius:10px;padding:15px 20px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',system-ui,sans-serif;width:100%;touch-action:manipulation}
+.cta-tagline{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.55);margin-top:12px}
+.footer-note{text-align:center;font-size:11px;color:var(--textMuted);padding-bottom:32px;line-height:1.65}
+
+@media(max-width:380px){
+  .welcome-h1{font-size:26px}
+  .q-text{font-size:21px}
+  .slider-display{font-size:30px}
+}
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div id="screen-welcome" class="screen shell active">
+  <div class="wiz-header">
+    <div>
+      <span class="logo-sub">Eau Claire Partners</span>
+      <div class="logo-name">Financial Discovery</div>
+    </div>
+  </div>
+  <div class="welcome-body">
+    <div class="badge">⏱ About 3 minutes</div>
+    <h1 class="welcome-h1">Let's build your financial picture.</h1>
+    <p class="welcome-desc">Answer a few quick questions about your income, expenses, and goals. You'll get a clear snapshot of where you stand — and what to focus on first.</p>
+    <div class="pills">
+      <div class="pill">📱 Mobile friendly</div>
+      <div class="pill">🔒 Stays on your device</div>
+      <div class="pill">🇨🇦 Built for Canadians</div>
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">Get Started →</button>
+    <div class="privacy-note">
+      <span>🔒</span>
+      <span>Nothing you enter is saved or sent anywhere. This tool runs entirely on your device.</span>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="screen-quiz" class="screen shell">
+  <div class="wiz-header">
+    <div>
+      <span class="logo-sub">Eau Claire Partners</span>
+      <div class="logo-name">Financial Discovery</div>
+    </div>
+    <div class="header-step" id="step-counter"></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progress-bar" style="width:0%"></div>
+  </div>
+  <div class="slide-area" id="slide-area"></div>
+  <div class="nav-row">
+    <button class="btn-back" id="btn-back" onclick="goBack()">←</button>
+    <button class="btn-primary" id="btn-next" onclick="goNext()">Continue →</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="screen-result" class="screen shell">
+  <div class="wiz-header">
+    <div>
+      <span class="logo-sub">Eau Claire Partners</span>
+      <div class="logo-name">Your Results</div>
+    </div>
+  </div>
+  <div class="result-body" id="result-body"></div>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────
+var answers = {};
+var stepIndex = 0;
+
+var QUESTIONS = [
+  {
+    id:'province', section:'About You', eyebrow:'Where You Live',
+    q:'Which province do you live in?',
+    hint:'Tax rules and programs like the FHSA vary by province.',
+    type:'grid',
+    options:[
+      {icon:'🏔️',label:'BC'},{icon:'🌾',label:'Alberta'},
+      {icon:'🌻',label:'Saskatchewan'},{icon:'🦬',label:'Manitoba'},
+      {icon:'🍁',label:'Ontario'},{icon:'⚜️',label:'Quebec'},
+      {icon:'🇨🇦',label:'Other'}
+    ]
+  },
+  {
+    id:'situation', section:'About You', eyebrow:'Your Household',
+    q:'What best describes your household?',
+    hint:'This shapes how we look at your income, expenses, and protection needs.',
+    type:'options',
+    options:[
+      {icon:'🧍',label:'Single',sub:'Just me'},
+      {icon:'👫',label:'Couple',sub:'Partner, no kids'},
+      {icon:'👨‍👩‍👧',label:'Family',sub:'Partner + children'},
+      {icon:'👩‍👧',label:'Single Parent',sub:'Me + children'}
+    ]
+  },
+  {
+    id:'age', section:'About You', eyebrow:'Your Age',
+    q:'How old are you?',
+    hint:'Your age affects contribution room, retirement timeline, and insurance costs.',
+    type:'options',
+    options:[
+      {icon:'🌱',label:'Under 30'},
+      {icon:'📈',label:'30–39'},
+      {icon:'🏗️',label:'40–49'},
+      {icon:'🏁',label:'50–59'},
+      {icon:'🌅',label:'60+'}
+    ]
+  },
+  {
+    id:'employment', section:'Income', eyebrow:'How You Earn',
+    q:'What is your primary source of income?',
+    hint:'This tells us how stable and predictable your cash flow is.',
+    type:'options',
+    options:[
+      {icon:'🏢',label:'Salaried Employee',sub:'Fixed pay, employer benefits'},
+      {icon:'⏱️',label:'Hourly / Part-time',sub:'Variable hours'},
+      {icon:'💼',label:'Self-Employed',sub:'Business owner or contractor'},
+      {icon:'🔀',label:'Multiple Sources',sub:'Salary + side income'}
+    ]
+  },
+  {
+    id:'income', section:'Income', eyebrow:'Monthly Take-Home',
+    q:'What is your household\'s monthly take-home pay?',
+    hint:'After tax — what actually lands in your bank. Include your partner\'s income if you share finances.',
+    type:'slider',
+    min:1000, max:20000, step:500, def:5000,
+    ticks:['$1K','$5K','$10K','$15K','$20K+']
+  },
+  {
+    id:'income_stability', section:'Income', eyebrow:'Income Reliability',
+    q:'How consistent is your income month to month?',
+    hint:'Variable income changes how much buffer you need.',
+    type:'options',
+    options:[
+      {icon:'📏',label:'Very consistent',sub:'Same amount every month'},
+      {icon:'〰️',label:'Mostly consistent',sub:'Occasional variation'},
+      {icon:'📊',label:'Quite variable',sub:'Fluctuates significantly'},
+      {icon:'❓',label:'Unpredictable',sub:'Hard to forecast'}
+    ]
+  },
+  {
+    id:'housing_type', section:'Housing', eyebrow:'Living Situation',
+    q:'What is your current housing situation?',
+    hint:'Your biggest fixed expense shapes everything downstream.',
+    type:'options',
+    options:[
+      {icon:'🏠',label:'Own — with mortgage',sub:'Monthly payments'},
+      {icon:'✅',label:'Own — mortgage-free',sub:'No mortgage payment'},
+      {icon:'🔑',label:'Renting',sub:'Monthly rent'},
+      {icon:'👨‍👩‍👧‍👦',label:'Living with family',sub:'Reduced cost'}
+    ]
+  },
+  {
+    id:'housing_cost', section:'Housing', eyebrow:'Housing Cost',
+    q:'How much do you spend on housing per month?',
+    hint:'Rent or mortgage. If mortgage-free, estimate property tax + maintenance.',
+    type:'slider',
+    min:0, max:5000, step:100, def:1800,
+    ticks:['$0','$1K','$2.5K','$5K']
+  },
+  {
+    id:'transport', section:'Expenses', eyebrow:'Transportation',
+    q:'Monthly transportation spend?',
+    hint:'Car payment, gas, insurance, maintenance — or transit if you don\'t own a vehicle.',
+    type:'slider',
+    min:0, max:2000, step:50, def:600,
+    ticks:['$0','$500','$1,000','$2,000']
+  },
+  {
+    id:'food', section:'Expenses', eyebrow:'Food & Dining',
+    q:'Monthly food spend — groceries plus dining out?',
+    hint:'Be honest — most people underestimate this by 30%.',
+    type:'slider',
+    min:200, max:3000, step:50, def:800,
+    ticks:['$200','$800','$1,500','$3,000']
+  },
+  {
+    id:'other_expenses', section:'Expenses', eyebrow:'Everything Else',
+    q:'Estimate your other monthly expenses combined.',
+    hint:'Utilities, phone, internet, subscriptions, personal care, clothing, entertainment.',
+    type:'slider',
+    min:100, max:3000, step:50, def:700,
+    ticks:['$100','$700','$1,500','$3,000']
+  },
+  {
+    id:'has_debt', section:'Debt', eyebrow:'Outstanding Debt',
+    q:'Do you currently carry any of these?',
+    hint:'Select all that apply.',
+    type:'multi',
+    options:[
+      {icon:'💳',label:'Credit card balance',id:'cc'},
+      {icon:'🚗',label:'Car loan',id:'car'},
+      {icon:'🎓',label:'Student loan',id:'student'},
+      {icon:'🏦',label:'Line of credit',id:'loc'},
+      {icon:'✨',label:'None — debt-free',id:'none'}
+    ]
+  },
+  {
+    id:'debt_payment', section:'Debt', eyebrow:'Monthly Debt Payments',
+    q:'Total monthly debt payments? (excluding mortgage)',
+    hint:'Minimum payments on cards, car loans, student loans, lines of credit.',
+    type:'slider',
+    min:0, max:3000, step:50, def:300,
+    ticks:['$0','$500','$1,500','$3,000'],
+    skip: function(a){ return a.has_debt && a.has_debt.indexOf('none') >= 0; }
+  },
+  {
+    id:'savings_accounts', section:'Savings', eyebrow:'Where You Save',
+    q:'Which savings accounts do you currently use?',
+    hint:'Select all that apply.',
+    type:'multi',
+    options:[
+      {icon:'💰',label:'TFSA',id:'tfsa'},
+      {icon:'📈',label:'RRSP',id:'rrsp'},
+      {icon:'🏡',label:'FHSA',id:'fhsa'},
+      {icon:'💵',label:'Regular savings / HISA',id:'hisa'},
+      {icon:'📊',label:'Non-registered investments',id:'invest'},
+      {icon:'❌',label:'Not currently saving',id:'none'}
+    ]
+  },
+  {
+    id:'monthly_savings', section:'Savings', eyebrow:'Monthly Savings',
+    q:'How much do you set aside for savings or investments each month?',
+    hint:'Include all transfers to TFSA, RRSP, savings accounts, or investments.',
+    type:'slider',
+    min:0, max:3000, step:50, def:200,
+    ticks:['$0','$500','$1,500','$3,000'],
+    skip: function(a){ return a.savings_accounts && a.savings_accounts.indexOf('none') >= 0; }
+  },
+  {
+    id:'emergency_fund', section:'Savings', eyebrow:'Emergency Fund',
+    q:'Do you have an emergency fund?',
+    hint:'Money set aside for unexpected events — job loss, medical, major repairs.',
+    type:'options',
+    options:[
+      {icon:'✅',label:'Yes — 3+ months covered',sub:'Fully funded'},
+      {icon:'🌱',label:'Partially built',sub:'1–2 months saved'},
+      {icon:'❌',label:'No — not yet',sub:'Haven\'t started'},
+      {icon:'🤔',label:'Not sure',sub:'Hard to say'}
+    ]
+  },
+  {
+    id:'insurance_coverage', section:'Protection', eyebrow:'Your Coverage',
+    q:'What insurance do you currently have?',
+    hint:'Select everything that applies — personal and employer-provided.',
+    type:'multi',
+    options:[
+      {icon:'❤️',label:'Life insurance',id:'life'},
+      {icon:'🛡️',label:'Critical illness',id:'ci'},
+      {icon:'🦽',label:'Disability / income replacement',id:'disability'},
+      {icon:'🏥',label:'Extended health & dental',id:'health'},
+      {icon:'🏠',label:'Home or tenant insurance',id:'home'},
+      {icon:'❌',label:'None of the above',id:'none'}
+    ]
+  },
+  {
+    id:'dependents', section:'Protection', eyebrow:'Who Depends on You',
+    q:'If your income stopped tomorrow, who would be affected?',
+    hint:'This determines how much income protection makes sense for your situation.',
+    type:'options',
+    options:[
+      {icon:'🧍',label:'Just me',sub:'No dependents'},
+      {icon:'👫',label:'My partner',sub:'Dual-income household'},
+      {icon:'👪',label:'Partner + children',sub:'Full family'},
+      {icon:'👩‍👧',label:'Children only',sub:'Single parent'},
+      {icon:'👴',label:'Parents or others',sub:'Extended dependents'}
+    ]
+  },
+  {
+    id:'top_goal', section:'Goals', eyebrow:'Your #1 Priority',
+    q:'What is your biggest financial goal right now?',
+    hint:'This is what your budget should work hardest toward.',
+    type:'options',
+    options:[
+      {icon:'🏡',label:'Buy a home',sub:'Saving for down payment'},
+      {icon:'💸',label:'Pay off debt',sub:'Eliminate what I owe'},
+      {icon:'🌱',label:'Build savings',sub:'Emergency fund or wealth'},
+      {icon:'📈',label:'Invest more',sub:'Grow my money'},
+      {icon:'🛡️',label:'Protect my family',sub:'Insurance & coverage'},
+      {icon:'🏖️',label:'Plan for retirement',sub:'Long-term future'}
+    ]
+  },
+  {
+    id:'timeline', section:'Goals', eyebrow:'Your Horizon',
+    q:'When do you need to see meaningful progress?',
+    type:'options',
+    options:[
+      {icon:'⚡',label:'Right now',sub:'Urgently need traction'},
+      {icon:'📅',label:'Within 1 year',sub:'Short-term focus'},
+      {icon:'🗓️',label:'1–3 years',sub:'Medium-term plan'},
+      {icon:'🔭',label:'3–5+ years',sub:'Building for the future'}
+    ]
+  },
+  {
+    id:'confidence', section:'How You Feel', eyebrow:'Self-Assessment',
+    q:'How confident do you feel about your current financial situation?',
+    type:'options',
+    options:[
+      {icon:'😟',label:'Not at all',sub:'Feels overwhelming'},
+      {icon:'😕',label:'Not very confident',sub:'Some gaps I know about'},
+      {icon:'😐',label:'Somewhat confident',sub:'Doing okay, could do better'},
+      {icon:'😊',label:'Pretty confident',sub:'On track, want to optimize'}
+    ]
+  }
+];
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function fmt(n) {
+  var num = parseFloat(n) || 0;
+  return '$' + Math.round(num).toLocaleString('en-CA');
+}
+
+function getVisible() {
+  return QUESTIONS.filter(function(q) {
+    return !q.skip || !q.skip(answers);
+  });
+}
+
+function pct(a, b) {
+  return b > 0 ? Math.round((a / b) * 100) : 0;
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function startQuiz() {
+  stepIndex = 0;
+  renderStep();
+  showScreen('screen-quiz');
+}
+
+function goBack() {
+  if (stepIndex === 0) { showScreen('screen-welcome'); return; }
+  stepIndex--;
+  renderStep();
+}
+
+function goNext() {
+  var visible = getVisible();
+  var q = visible[stepIndex];
+  // ensure slider value is saved
+  if (q.type === 'slider') {
+    var sl = document.getElementById('range-input');
+    if (sl) answers[q.id] = parseInt(sl.value, 10);
+  }
+  if (stepIndex < visible.length - 1) {
+    stepIndex++;
+    renderStep();
+  } else {
+    showResults();
+  }
+}
+
+function canProceed() {
+  var visible = getVisible();
+  var q = visible[stepIndex];
+  if (q.type === 'slider') return true;
+  if (q.type === 'multi') return answers[q.id] && answers[q.id].length > 0;
+  return !!answers[q.id];
+}
+
+function updateNextBtn() {
+  var btn = document.getElementById('btn-next');
+  var visible = getVisible();
+  var isLast = stepIndex === visible.length - 1;
+  btn.disabled = !canProceed();
+  btn.textContent = isLast ? 'See My Results →' : 'Continue →';
+}
+
+// ── RENDER STEP ───────────────────────────────────────────────────────────
+function renderStep() {
+  var visible = getVisible();
+  var q = visible[stepIndex];
+  var total = visible.length;
+
+  document.getElementById('step-counter').textContent = (stepIndex+1) + ' / ' + total;
+  document.getElementById('progress-bar').style.width = (stepIndex / total * 100) + '%';
+
+  var area = document.getElementById('slide-area');
+  area.innerHTML = buildSlide(q);
+  area.scrollTop = 0;
+
+  // Bind slider
+  if (q.type === 'slider') {
+    var sl = document.getElementById('range-input');
+    var disp = document.getElementById('slider-display');
+    sl.addEventListener('input', function() {
+      answers[q.id] = parseInt(this.value, 10);
+      disp.textContent = fmt(this.value);
+    });
+  }
+
+  // Bind multi
+  if (q.type === 'multi') {
+    area.querySelectorAll('.opt-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        var id = this.dataset.id;
+        var cur = answers[q.id] || [];
+        if (id === 'none') {
+          cur = ['none'];
+        } else {
+          cur = cur.filter(function(v){ return v !== 'none'; });
+          var idx = cur.indexOf(id);
+          if (idx >= 0) cur.splice(idx, 1);
+          else cur.push(id);
+        }
+        answers[q.id] = cur;
+        // re-render checkmarks
+        area.querySelectorAll('.opt-card').forEach(function(c) {
+          var cid = c.dataset.id;
+          var sel = cur.indexOf(cid) >= 0;
+          c.classList.toggle('sel-teal', sel);
+          var dot = c.querySelector('.check-dot');
+          var check = c.querySelector('.opt-check');
+          if (dot) dot.style.display = sel ? 'block' : 'none';
+          if (check) { check.style.background = sel ? 'var(--teal)' : ''; check.style.borderColor = sel ? 'var(--teal)' : ''; }
+        });
+        updateNextBtn();
+      });
+    });
+  }
+
+  // Bind single/grid options
+  if (q.type === 'options' || q.type === 'grid') {
+    area.querySelectorAll('.opt-card, .opt-compact').forEach(function(card) {
+      card.addEventListener('click', function() {
+        var val = this.dataset.val;
+        answers[q.id] = val;
+        // Highlight
+        area.querySelectorAll('.opt-card, .opt-compact').forEach(function(c){
+          c.classList.remove('selected');
+          var dot = c.querySelector('.check-dot');
+          var check = c.querySelector('.opt-check');
+          if (dot) dot.style.display = 'none';
+          if (check) { check.style.background = ''; check.style.borderColor = ''; }
+        });
+        this.classList.add('selected');
+        var dot2 = this.querySelector('.check-dot');
+        var check2 = this.querySelector('.opt-check');
+        if (dot2) dot2.style.display = 'block';
+        if (check2) { check2.style.background = 'var(--gold)'; check2.style.borderColor = 'var(--gold)'; }
+        updateNextBtn();
+        // Auto-advance after brief pause
+        setTimeout(function() {
+          if (canProceed()) goNext();
+        }, 220);
+      });
+    });
+  }
+
+  updateNextBtn();
+}
+
+function buildSlide(q) {
+  var html = '<div class="q-eyebrow">' + q.eyebrow + '</div>';
+  html += '<div class="q-text">' + q.q + '</div>';
+  if (q.hint) html += '<div class="q-hint">' + q.hint + '</div>';
+
+  if (q.type === 'options') {
+    html += '<div class="opt-list">';
+    q.options.forEach(function(opt) {
+      var sel = answers[q.id] === opt.label;
+      var selCls = sel ? ' selected' : '';
+      html += '<div class="opt-card' + selCls + '" data-val="' + esc(opt.label) + '">';
+      if (opt.icon) html += '<div class="opt-icon">' + opt.icon + '</div>';
+      html += '<div class="opt-text"><div class="opt-label">' + opt.label + '</div>';
+      if (opt.sub) html += '<div class="opt-sub">' + opt.sub + '</div>';
+      html += '</div>';
+      html += '<div class="opt-check" style="' + (sel ? 'background:var(--gold);border-color:var(--gold)' : '') + '"><div class="check-dot" style="display:' + (sel ? 'block' : 'none') + '"></div></div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  if (q.type === 'grid') {
+    html += '<div class="opt-grid-2">';
+    q.options.forEach(function(opt) {
+      var sel = answers[q.id] === opt.label;
+      html += '<div class="opt-compact' + (sel?' selected':'') + '" data-val="' + esc(opt.label) + '">';
+      html += '<span class="opt-icon">' + opt.icon + '</span>';
+      html += '<div class="opt-label">' + opt.label + '</div></div>';
+    });
+    html += '</div>';
+  }
+
+  if (q.type === 'slider') {
+    var val = answers[q.id] !== undefined ? answers[q.id] : q.def;
+    html += '<div class="slider-display" id="slider-display">' + fmt(val) + '</div>';
+    html += '<div class="slider-sub">per month</div>';
+    html += '<input type="range" id="range-input" min="' + q.min + '" max="' + q.max + '" step="' + q.step + '" value="' + val + '">';
+    if (q.ticks) {
+      html += '<div class="slider-ticks">';
+      q.ticks.forEach(function(t){ html += '<span>' + t + '</span>'; });
+      html += '</div>';
+    }
+  }
+
+  if (q.type === 'multi') {
+    var cur = answers[q.id] || [];
+    html += '<div class="opt-list">';
+    q.options.forEach(function(opt) {
+      var sel = cur.indexOf(opt.id) >= 0;
+      html += '<div class="opt-card' + (sel?' sel-teal':'') + '" data-id="' + opt.id + '">';
+      html += '<div class="opt-icon">' + opt.icon + '</div>';
+      html += '<div class="opt-text"><div class="opt-label">' + opt.label + '</div></div>';
+      html += '<div class="opt-check" style="' + (sel ? 'background:var(--teal);border-color:var(--teal)' : '') + '"><div class="check-dot" style="display:' + (sel?'block':'none') + '"></div></div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  return html;
+}
+
+function esc(s) {
+  return String(s).replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+// ── RESULTS ───────────────────────────────────────────────────────────────
+function showResults() {
+  var income = answers.income || 5000;
+  var housing = answers.housing_cost || 1800;
+  var transport = answers.transport || 600;
+  var food = answers.food || 800;
+  var other = answers.other_expenses || 700;
+  var debt = (answers.has_debt && answers.has_debt.indexOf('none') >= 0) ? 0 : (answers.debt_payment || 0);
+  var savings = (answers.savings_accounts && answers.savings_accounts.indexOf('none') >= 0) ? 0 : (answers.monthly_savings || 0);
+
+  var totalExp = housing + transport + food + other + debt + savings;
+  var surplus = income - totalExp;
+  var savingsRate = income > 0 ? Math.round((savings / income) * 100) : 0;
+  var needsPct = income > 0 ? Math.round(((housing + transport + other + debt) / income) * 100) : 0;
+
+  var goal = answers.top_goal || 'build savings';
+  var hasCoverage = answers.insurance_coverage && answers.insurance_coverage.indexOf('none') < 0 && answers.insurance_coverage.length > 0;
+  var hasCI = answers.insurance_coverage && answers.insurance_coverage.indexOf('ci') >= 0;
+  var hasDisability = answers.insurance_coverage && answers.insurance_coverage.indexOf('disability') >= 0;
+  var hasFHSA = answers.savings_accounts && answers.savings_accounts.indexOf('fhsa') >= 0;
+  var emergencyOk = answers.emergency_fund === 'Yes — 3+ months covered';
+
+  // Build insights
+  var insights = [];
+  if (surplus < 0) {
+    insights.push({type:'red', icon:'🚨', title:'Monthly shortfall detected', body:'Your expenses exceed your income by ' + fmt(Math.abs(surplus)) + '/month — that\'s ' + fmt(Math.abs(surplus)*12) + ' per year in the red. Review your discretionary spending first.'});
+  } else if (savingsRate < 10 && surplus > 0) {
+    insights.push({type:'gold', icon:'💡', title:'Savings opportunity', body:'You have ' + fmt(surplus) + ' available each month but only ' + savingsRate + '% going to savings. Automating even ' + fmt(surplus * 0.5) + '/month on payday would compound significantly over time.'});
+  }
+  if (needsPct > 60) {
+    insights.push({type:'purple', icon:'🏠', title:'High fixed costs', body:'Your housing, transport, and debt payments are ' + needsPct + '% of income — above the 50% guideline. This limits flexibility. Housing and transportation are the two biggest levers to pull.'});
+  }
+  if (!hasCoverage) {
+    insights.push({type:'red', icon:'🛡️', title:'No protection coverage detected', body:'If your income stopped due to illness or injury, nothing would cover your ' + fmt(totalExp) + '/month in expenses. This is the most urgent gap in your financial plan to address.'});
+  } else if (!hasCI || !hasDisability) {
+    insights.push({type:'teal', icon:'🛡️', title:'Coverage gap to review', body:(!hasCI ? 'Critical illness coverage appears missing. 1 in 3 Canadians experience a serious illness before retirement.' : 'Disability / income replacement protection appears missing. Your income is your most valuable asset.')});
+  }
+  if (!emergencyOk) {
+    insights.push({type:'gold', icon:'🌱', title:'Emergency fund priority', body:'Without 3 months of expenses saved (' + fmt(totalExp * 3) + '), one unexpected event can derail everything. Build this before investing aggressively.'});
+  }
+  if (answers.top_goal === 'Buy a home' && !hasFHSA) {
+    insights.push({type:'teal', icon:'🏡', title:'The FHSA could help you', body:'The First Home Savings Account gives you a tax deduction on contributions AND tax-free withdrawals for a first home purchase — combining the best of the RRSP and TFSA.'});
+  }
+  if (surplus >= 0 && savingsRate >= 10 && hasCoverage && emergencyOk) {
+    insights.push({type:'green', icon:'✅', title:'Strong foundation', body:'You\'re saving, protected, and running a surplus. The next step is optimizing — making sure every dollar works as hard as possible for your goals.'});
+  }
+  if (insights.length === 0) {
+    insights.push({type:'green', icon:'✅', title:'Looking solid', body:'Keep building on this foundation. A conversation with an advisor can help you identify the next level of optimization.'});
+  }
+
+  // Build expenses list
+  var expRows = [
+    {label:'🏠 Housing', val:housing},
+    {label:'🚗 Transportation', val:transport},
+    {label:'🛒 Food', val:food},
+    {label:'💡 Other Expenses', val:other},
+    {label:'📉 Debt Payments', val:debt},
+    {label:'💰 Savings', val:savings}
+  ].filter(function(r){ return r.val > 0; });
+
+  var insightHtml = insights.map(function(ins) {
+    return '<div class="insight ins-' + ins.type + '"><span class="i-icon">' + ins.icon + '</span><div class="i-text"><div class="i-title">' + ins.title + '</div>' + ins.body + '</div></div>';
+  }).join('');
+
+  var expRowHtml = expRows.map(function(r) {
+    return '<div class="r-row"><span class="r-lbl">' + r.label + '</span><span class="r-val">' + fmt(r.val) + '</span></div>';
+  }).join('');
+
+  var surplusClass = surplus >= 0 ? 'green' : 'red';
+  var surplusLabel = surplus >= 0 ? 'Monthly Surplus' : 'Monthly Shortfall';
+  var srClass = savingsRate >= 10 ? 'green' : 'red';
+
+  document.getElementById('result-body').innerHTML =
+    '<div class="result-hero">' +
+      '<div class="result-icon">📊</div>' +
+      '<div class="result-title">Your Financial Snapshot</div>' +
+      '<div class="result-sub">Based on what you shared — here\'s where things stand and what to focus on first.</div>' +
+    '</div>' +
+
+    '<div class="r-card r-card-teal">' +
+      '<div class="r-card-title">Monthly Cash Flow</div>' +
+      '<div class="r-row"><span class="r-lbl">Take-Home Income</span><span class="r-val gold">' + fmt(income) + '</span></div>' +
+      '<div class="r-row"><span class="r-lbl">Total Expenses</span><span class="r-val">' + fmt(totalExp) + '</span></div>' +
+      '<div class="r-row"><span class="r-lbl">' + surplusLabel + '</span><span class="r-val ' + surplusClass + '">' + (surplus >= 0 ? '+' : '') + fmt(surplus) + '</span></div>' +
+      '<div class="r-row"><span class="r-lbl">Savings Rate</span><span class="r-val ' + srClass + '">' + savingsRate + '%</span></div>' +
+    '</div>' +
+
+    '<div class="r-card r-card-gold">' +
+      '<div class="r-card-title">Expense Breakdown</div>' +
+      expRowHtml +
+    '</div>' +
+
+    '<div style="margin-bottom:14px">' +
+      '<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--textMuted);margin-bottom:10px;font-weight:500">Key Insights</div>' +
+      insightHtml +
+    '</div>' +
+
+    '<div class="cta-card">' +
+      '<div class="cta-h3">Ready to go further?</div>' +
+      '<p class="cta-p">This snapshot is a starting point. A real conversation turns these numbers into a plan — built around your goal to <strong>' + goal.toLowerCase() + '</strong>.</p>' +
+      '<button class="btn-cta" onclick="alert(\'Connect with Kyle at Eau Claire Partners to book your free 20-minute call.\')">Book a Free 20-Minute Call</button>' +
+      '<div class="cta-tagline">Get my lessons, not my scars. — Kyle | Eau Claire Partners</div>' +
+    '</div>' +
+
+    '<div class="footer-note">Eau Claire Partners · Licensed across all Canadian provinces<br>This tool is for educational purposes and does not constitute financial advice.</div>';
+
+  showScreen('screen-result');
+}
+</script>
+</body>
+</html>
